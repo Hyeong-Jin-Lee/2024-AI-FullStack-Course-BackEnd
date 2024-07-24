@@ -81,7 +81,7 @@ router.get('/list', async(req, res) => {
 /*
 - 단일 신규 게시글 정보 등록 요청과 응답처리 라우팅메소드
 - 호출주소: http://localhost:3000/api/articles/create
-- 호출방식: Get
+- 호출방식: Post
 - 응답결과: 등록처리완료된 단일게시글 정보 반환(여기는 게시글 번호가 있어요.)
 */
 router.post('/create',async(req,res)=>{
