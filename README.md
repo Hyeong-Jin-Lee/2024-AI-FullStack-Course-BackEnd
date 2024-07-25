@@ -1,1 +1,1 @@
-//AI Web FullStack Course
+AI Web FullStack Course
