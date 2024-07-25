@@ -1,5 +1,5 @@
-<!-- 이 list.html문서는 html5 버전 표준문법으로 코딩된 문서형식입니다. -->
-<!DOCTYPE html>
+<!-- 이 list.html문서는 html5 버전 표준문법으로 코딩된 문서형식입니다 -->
+<!DOCTYPE html5>
 <html>
 
 <head>
@@ -120,16 +120,16 @@
                         <div class="col-sm-4">
                             <div class="form-group">
                                 <label class="control-label" for="OrderName">아이피주소</label>
-                                <input type="text" id="ipadress" class="form-control">
+                                <input type="text" id="ipaddress" class="form-control">
                             </div>
                         </div>
                         <div class="col-sm-4">
                             <div class="form-group">
                                 <label class="control-label" for="MobileNo">게시여부</label>
                                 <select id="display" name="name" class="form-control">
-                                    <option value="9" selected>전체</option>
-                                    <option value="1">게시함</option>
-                                    <option value="0">게시안함</option>
+                                    <option value=9 selected>전체</option>
+                                    <option value=1>게시함</option>
+                                    <option value=2>게시안함</option>
                                 </select>
                             </div>
                         </div>
@@ -166,11 +166,9 @@
                                                 <td>111.111.111.111</td>
                                                 <td>20</td>
                                                 <td>게시중</td>
-                                                <td>이형진(1)</td>
+                                                <td>강창훈(1)</td>
                                                 <td>2024-07-24</td>
                                             </tr> -->
-
-                                    
 
                                         </tbody>
                                     </table>
@@ -200,7 +198,7 @@
 
     <!-- Mainly scripts -->
     <!-- JQuery 라이브러리는 순수자바스크립트 코딩의 생산성을 향상시켜주는 개발 생산/효율성 지원 오픈소스 라이브러리는
-    프론트엔드 프레임워크(React(next.js), Vue.js, Angular.js)등이 나타나기전까지 전세계에서 가장 많이 사용한 프론트엔드 코딩 라이브러리는
+    프론트엔드 프레임워크(React(next.js),Vue.js,Angular.js)등이 나타나기전까지 전세계에서 가장 많이 사용한 프론트엔드 코딩 라이브러리
     현재도 여러 분야에서 유효하게 사용됨(관리자사이트등..) -->
     <script src="/js/jquery-3.1.1.min.js"></script>
     <script src="/js/popper.min.js"></script>
@@ -220,36 +218,36 @@
 
     <script>
 
-        //현재 html문서가 웹브라우저에 모두 완전히 로딩이 완료되면
+        //현재 html문서가 웹브라우저에 모두완전히 로딩이 완료되면
         //지정한 콜백함수를 실행시켜라..ready('콜백함수')
         $(document).ready(function(){
+
             //JQuery의 AJAX를 이용해 백엔드 RESTAPI주소를 호출하여 데이터를 가져온다.
-            //get('백엔드RESTAPI호출주소',콜백함수(서버에서 보내준 데이터))
-            $.get('http://localhost:3000/api/articles/list', function(result){
+            //get('백엔드RESTAPI호출주소',콜백함수(서버에서보내준데이터))
+            $.get('http://localhost:3000/api/articles/list',function(result){
 
                 //웹브라우저 개발자도구 콘솔탭에 로깅해본다.. 잘 넘어오는지..아닌지...
-                console.log("백엔드 RESTful API에서 제공된 데이터: ", result);
+                console.log("백엔드 RESTful API에서 제공된 데이터:",result);
 
-                //REST API 서버에서 제공된 데이터 수만큼 반복적으로
-                //동적으로 HTML소스를 추가해 웹페이지 특정 요소에 자식요소를 추가한다.
+                //REST API 서버에서 제공된 데이터 수만큼 반복적으로 
+                //동적으로 HTML소스를 추가해 웹페이지  특정 요소에 자식요소를 추가한다.
 
                 //데이터 목록을 반복해서 몬가 작업할때 사용
-                //.each('배열데이터', 배열에서 하나씩 꺼내 로직을 구현하는 함수)
-                $.each(result.data, function(index, item){
+                //.each('배열데이터',배열에서 하나씩꺼내 로직을 구현하는 함수)
+                $.each(result.data,function(index,item){
 
-                    const trTag = ` <tr>
-                                        <td>${item.article_id}</td>
-                                        <td><a href="/front/modify?id=${item.article_id}">${item.title}</a></td>
-                                        <td>${item.ip_address}</td>
-                                        <td>${item.view_cnt}</td>
-                                        <td>${item.display}</td>
-                                        <td>${item.regist_id}</td>
-                                        <td>2${item.regist_date}</td>
-                                    </tr>
-                                  `;
+                    const trTag=`<tr>
+                                    <td>${item.article_id}</td>
+                                    <td><a href="/front/modify.html?id=${item.article_id}">${item.title}</a></td>
+                                    <td>${item.ip_address}</td>
+                                    <td>${item.view_cnt}</td>
+                                    <td>${item.display}</td>
+                                    <td>${item.regist_id}</td>
+                                    <td>${item.regist_date}</td>
+                                </tr>`;
 
                     //$("#html id값으로 html요소를 불러온다.")
-                    //tobdy태그를 찾아서 태그안에 trTag를 추가(append(추가할요소))
+                    //tbody태그를 찾아서 태그안에 trTag를 추가(append(추가할요소))
                     $("#list").append(trTag);
                 });
 
@@ -260,4 +258,5 @@
 
 
 </body>
+
 </html>

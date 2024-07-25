@@ -96,7 +96,7 @@
                             <a>게시글정보관리</a>>
                         </li>
                         <li class="active">
-                            <strong>신규게시글작성</strong>
+                            <strong>해당 게시글 정보확인</strong>
                         </li>
                     </ol>
                 </div>
@@ -107,7 +107,7 @@
 
             <!--우측 콘텐츠 영역 -->
             <div class="wrapper wrapper-content">
-                <form id="createForm">
+                <form id="modifyForm">
                     <div class="ibox-content m-b-sm border-bottom">
 
                 <!-- 글제목영역 -->
@@ -145,7 +145,8 @@
 
 
                     <div class="text-center">
-                        <button type="submit" class="btn btn-primary">저장</button>
+                        <button type="submit" class="btn btn-primary">수정</button>
+                        <button type="button" id= "btnDelete"class="btn btn-danger">삭제</button>
                         <a href="/front/list.html" class="btn btn-info">목록</a>
                     </div>
 
@@ -183,12 +184,54 @@
 
     <script>
 
+        // list.html에서 전달해주는 게시글 고유번호 추출하기
+        // front/modify.html?id=1 호출되는 주소에서 id값을 클라이언트 환경에서 추출해보자.
+        
+        //현재 URL에서(/front/modify.html?id=1) 쿼리스트링 키명으로 값을 추출하는 클라이언트 자바스크립트 함수
+        //정규식 문법을 이용한 키값추출하기
+        function getQueryString(keyName){ 
+            var results = new RegExp('[\?&]'+keyName+'=([^&#]*)').exec(window.location.href); 
+            console.log("====================>",results); 
+            if(results != null){ 
+                return results[1] || 0; 
+            } 
+            return results;
+        }
+
+        //URL에서 id값 추출하여 게시글고유번호 추출
+        var articleIdx = getQueryString("id");
+        console.log("현재 게시글 고유번호:",articleIdx);
+
+        //현재 웹페이지가 웹브라우저에 모두 로딩(렌더링)이 완료된 실행되는 ready(콜백함수);
+        $(document).ready(function(){
+
+            //백엔드 REST API에서 단일게시글 정보를 조회해온다.
+            //Jquery AJAX Get방식으로 특정 RESTAPI주소를 호출해서 데이터를 조회해 온다.
+            //get('백엔드 api주소', 호출결과콜백함수(호출결과값){});
+            $.get(`http://localhost:3000/api/articles/${articleIdx}`,function(result){
+
+                console.log("백엔드 API에서 제공해준 JSON데이터 확인: ", result);
+
+                if(result.code==200){
+                    //백엔드에서 제공해준 data를 기반으로 UI HTLM태그요소에 값으로 바인딩한다.
+                    $("#title").val(result.data.title);
+                    $("#contents").val(result.data.contents);
+                    $("#display").val(result.data.display);
+                }
+                else{
+                    alert("RESTful API 데이터 호출에 실패했습니다.\n 관리자에게 문의하세요");
+                }
+
+            });
+
+        });
+
         //웹페이지가 로딩완료하면 마우스포커스를 제목입력박스에 가져다 준다. (UX향상기능)
         $("#title").focus();
 
         // 입력폼 유효성 검사 실시
-        // createForm form태그에 onSubmit이벤트가 발생하면 실행할 기능(유효성검사)를 정의한다.
-        $("#createForm").submit(function(e){
+        // modifyForm form태그에 onSubmit이벤트가 발생하면 실행할 기능(유효성검사)를 정의한다.
+        $("#modifyForm").submit(function(e){
 
             //더 이상 서버로 데이터를 전송하는 submit이벤트를 취소한다.
             //프론트엔드 개발시에만 사용함..
@@ -204,12 +247,13 @@
             //게시여부요소의 선택 유효성검사 체크하기
             if($("#display").val() == "9"){
                 alert("게시여부를 선택해주세요.");
-                $("#title").focus();
+                $("#display").focus();
                 return false;
             }
             
             //Step1: 서버로 전송할 데이터 소스 준비하기(JSON데이터)
             var article = {
+                "article_id": articleIdx,
                 "title":$("#title").val(),
                 "contents":$("#contents").val(),
                 "display": $("#display").val()
@@ -217,13 +261,14 @@
             
             // Jquery AJAX Post방식으로 클라이언트에서 서버RESTAPI로 데이터를 전송하는 메소드
             // post('API호출주소', 전달데이터).done(콜백함수(처리결과데이터){});
-            $.post('http://localhost:3000/api/articles/create', article).done(function(result){
+            $.post('http://localhost:3000/api/articles/modify', article).done(function(result){
 
-                console.log("신규 게시물 등록처리 결과값 확인하기 :", result);
+
+                console.log("기존 게시물 수정처리 결과값 확인하기 :", result);
 
                 //정상적으로 처리된 경우
                 if(result.code == 200){
-                    alert("등록완료");
+                    alert("수정완료");
                     location.href="/front/list.html";
                 }else{
                     //서버 에러난 경우
@@ -235,6 +280,24 @@
 
         }); //#는 id를 찾는 거
 
+        //삭제버튼 클릭 이벤트 핸들러
+        $("#btnDelete").click(function(){
+            if(confirm('정말로 삭제하시겠습니까?')){
+                
+                //JQuery AJAX로 백엔드 삭제 API를 호출합니다.
+                $.get(`http://localhost:3000/api/articles/delete?aid=${articleIdx}`,function(result){
+                    console.log("삭제 RESTful API 호출결과값 출력:",result);
+
+                    if(result.code==200){
+                        alert("삭제완료!!");
+                        location.href="/front/list.html";
+                    }else{
+                        alert("백엔드 API 호출에러발생"+ result.result);
+                    }
+                });
+
+            }
+        })
     </script>
 
 </body>
