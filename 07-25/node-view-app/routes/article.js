@@ -4,6 +4,7 @@
 //app.js에서 라우터 파일 참조시 기본주소를 설정해 준다.
 var express = require('express');
 var router = express.Router();
+
 /*
 - 게시글 목록 웹페이지 요청과 응답처리 라우팅 메소드 구현
 - 호출주소: http://localhost:3000/article/list
@@ -115,16 +116,16 @@ router.post('/create',async(req,res)=>{
 */
 router.post('/modify',async(req,res)=>{
    // Step1: 사용자 수정데이터를 추출하고 수정할 데이터 소스를 생성
-   // 수정할 대상이 되는 게시글 고유번호
-   const articleIdx = req.body.article_id; //hidden태그의 name속성값
+    // 수정할 대상이 되는 게시글 고유번호
+    const articleIdx = req.body.article_id; //hidden태그의 name속성값
 
-   // 실제 수정할데이터항목별 값 세팅하기
-   const article={
+    // 실제 수정할데이터항목별 값 세팅하기
+    const article={
         title:req.body.title,
         contents:req.body.contents,
         display:req.body.display,
         modify_id:1,
-        modify_date:Date.now()
+        modify_date: Date.now()
     }
 
    // Step2: DB게시글 테이블에 특정게시글 번호를 기준으로 게시글 정보를 수정처리한다
@@ -137,36 +138,13 @@ router.post('/modify',async(req,res)=>{
    res.redirect('/article/list');
 });
 
+
 /*
-- 기존 게시글 데이터 삭제처리 요청과 응답처리 라우팅메소드
-- 호출주소: http://localhost:3000/article/delete?aid=1
-- 호출방식: Get
-- 응답결과: 해당 게시글 삭제처리하고 목록페이지로 이동시킴
+-기존 게시글 데이터 삭제처리 요청과 응답처리 라우팅메소드 
+-호출주소: http://localhost:3000/article/delete?aid=1
+-호출방식: Get
+-응답결과: 해당 게시글 삭제처리하고 목록페이지로 이동시킴
 */
-router.get('/modify/:idx',async(req,res)=>{
-
-    // Step1: url주소에서 게시글 고유번호를 추출합니다.
-    const articleIdx = req.params.idx;
-
-    // Step2: DB게시글 페이지에서 해당 게시글 고유번호에 해당하는 단일게시글 정보를 조회해옵니다.
-    // 조회해 왔다고 가정
-    const article = {
-        
-            article_id: 1,
-            title:"게시글 제목1입니다.",
-            contents:"게시글1 내용입니다.",
-            display:1,
-            view_cnt:10,
-            ip_address:"111.111.111.111",
-            regist_id:1,
-            regist_date:Date.now()
-    }
-
-    // Step3: DB에서 가져온 단일게시글 정보를 modify.ejs 뷰파일에 전달
-    res.render('article/modify.ejs',{article:article});
-});
-
-
 router.get('/delete',async(req,res)=>{
     
     //req.query.키명으로 쿼리스트링방식으로 전달된 데이터 추출
@@ -179,6 +157,34 @@ router.get('/delete',async(req,res)=>{
 
 });
 
+
+/*
+-기존 등록된 게시글 데이터를 조회해서 게시글 수정 웹페이지에 데이터를 포함한 웹페이지 요청과 응답처리 라우팅메소드 
+-호출주소: http://localhost:3000/article/modify/1
+-호출방식: Get
+-응답결과: db에서 해당 단일게시글 정보를 조회해와서 지정 뷰파일에 데이터를 전달하고 뷰파일내에서 해당 데이터를 html태그에 출력해서 최종 
+-웹브라우저에 동적으로 변경된 웹페이지를 반환한다. 
+*/
+router.get('/modify/:idx',async(req,res)=>{
+
+    // Step1: url주소에서 게시글 고유번호를 추출합니다.
+    const articleIdx = req.params.idx;
+
+    // Step2: DB게시글 페이지에서 해당 게시글 고유번호에 해당하는 단일게시글 정보를 조회해옵니다.
+    // 조회해 왔다고 가정
+    const article = {
+            article_id: 1,
+            title:"게시글 제목1입니다.",
+            contents:"게시글1 내용입니다.",
+            display:1,
+            view_cnt:10,
+            ip_address:"111.111.111.111",
+            regist_id:1,
+            regist_date:Date.now()
+    }
+    // Step3: DB에서 가져온 단일게시글 정보를 modify.ejs 뷰파일에 전달
+    res.render('article/modify.ejs',{article:article});
+});
 
 
 
