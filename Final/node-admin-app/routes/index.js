@@ -13,7 +13,7 @@ router.get('/', function(req, res, next) {
 - 응답결과 : login.ejs 뷰페이지 반환
 */
 router.get('/login',function(req,res,next){
-  res.render('login.ejs',{resultMsg:''});
+  res.render('login.ejs',{layout:false});
 })
 
 /*
@@ -42,7 +42,7 @@ router.post('/login',function(req,res,next){
 
 })
 
-
+// 요청주소: http://localhost:5001/main
 router.get('/main',function(req,res,next){
   res.render('main.ejs');
 })

@@ -30,8 +30,39 @@ router.get('/create', function(req, res, next) {
 */
 router.post('/create', function(req, res, next) {
     //기능구현
-    res.redirect('/admin/create');
+
+    const articleIdx = req.body.id; 
+    const pw = req.body.pw;
+    const code = req.body.code;
+
+    res.redirect('/admin/list');
 });
 
+
+router.post('/modify',async(req,res)=>{
+ 
+    const id = req.body.id;
+    const pw = req.body.pw;
+    const code = req.body.code;
+
+    res.redirect('/admin/list');
+ });
+
+router.get('/delete',async(req,res)=>{
+    
+    //req.query.키명으로 쿼리스트링방식으로 전달된 데이터 추출
+    const article = req.query.aid;
+
+    //Step2: 데이터 삭제처리
+    
+    //Step3: 사용자 브라우저 게시글 목록 이동처리
+    res.redirect('/admin/list');
+
+});
+
+router.get('/modify/:id',async(req,res)=>{
+
+    res.render('admin/modify.ejs');
+});
 
 module.exports = router;
