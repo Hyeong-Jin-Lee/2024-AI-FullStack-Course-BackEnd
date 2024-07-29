@@ -4,17 +4,33 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+//레이아웃 노드패키지 참조하기
+var expressLayouts = require('express-ejs-layouts');
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 //개발자 정의 라우터 파일 참조하기 *게시글정보관리
 var articleRouter = require('./routes/article');
 
+// ORM Model영역의 sequelize 속성(DB연결객체)을 참조함
+var sequelize = require('./models/index.js').sequelize;
+
 var app = express();
+
+//mysql과 자동연결처리 및 모델기반 물리 테이블 생성처리제공
+sequelize.sync();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
+// 모든 뷰파일에 적용되는 레이아웃 뷰파일 설정하기
+app.set('layout', 'layout.ejs'); //전체레이아웃 파일 지정하기
+app.set("layout extractScripts", true);
+app.set("layout extractStyles", true);
+app.set("layout extractMetas", true);
+app.use(expressLayouts); //노드앱에 레이아웃 기능 추가적용하기
 
 app.use(logger('dev'));
 app.use(express.json());
