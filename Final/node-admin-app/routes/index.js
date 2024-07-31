@@ -1,50 +1,87 @@
+//index.js 라우터의 용도는 전체 웹사이트의 공통기능에 대한 라우팅 기능을 제공합니다.
+//기본접속주소는 http://localhost:5001로 접근하게 app.js에서 설정되어 있다.
+
 var express = require('express');
 var router = express.Router();
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: '안녕' });
-});
+// 관리자 암호를 단방향암호화(해시알고리즘) 하기 위해 bcryptjs패키지 참조하기
+var bcrypt = require('bcryptjs');
 
+//ORM DB객체를 참조합니다.
+var db = require('../models/index.js');
 /*
 - 관리자 웹사이트 로그인 웹페이지 요청과 응답처리 라우팅메소드
 - 요청주소: http://localhost:5001/login
 - 요청방식: Get
-- 응답결과 : login.ejs 뷰페이지 반환
+- 응답결과: login.ejs 뷰페이지 반환
 */
-router.get('/login',function(req,res,next){
-  res.render('login.ejs',{layout:false});
+router.get('/login', function (req, res, next) {
+  //아이디/암호가 일치하지 않은 경우 다시 로그인뷰를 전달하고
+  //로그인뷰에 결과메시지 데이터를 전달한다.
+  let resultMsg = {
+    code: 400,
+    msg: ""
+  }
+
+  res.render('login.ejs', { layout: false, resultMsg });
 })
 
 /*
-- 관리자 웹사이트 정보처리 요청과 응답 라우팅메소드
+- 관리자가 입력한 아이디/암호를 추출하여 실제 로그인 프로세스를 처리하는 라우팅메소드
 - 요청주소: http://localhost:5001/login
 - 요청방식: Post
-- 응답결과 : login.ejs 뷰페이지 반환
+- 응답결과 : 
 */
-router.post('/login',function(req,res,next){
-  const userid=req.body.userid;
-  const password=req.body.password;
+router.post('/login', async (req, res, next) => {
 
-  //id/password 체크 후 결과확인
-  const result = true; 
-
-  if(result){
-    
-    //정상 로그인시
-    res.redirect('/main');
-  }
-  else{
-    
-    //아이디 또는 암호가 틀리면 다시 로그인페이지 반환
-    res.render('login.ejs',{resultMsg:'로그인 실패'});
+  //아이디/암호가 일치하지 않은 경우 다시 로그인뷰를 전달하고
+  //로그인뷰에 결과메시지 데이터를 전달한다.
+  let resultMsg = {
+    code: 400,
+    msg: ""
   }
 
-})
+  //Step1: 관리자 아이디/암호를 추출
+  const admin_id = req.body.admin_id;
+  const admin_password = req.body.admin_password;
 
+  //Step2: 동일한 관리자 아이디 정보를 조회
+  const admin = await db.Admin.findOne({
+    where: { admin_id: admin_id }
+  });
+
+  //Step3: DB저장 암호와 관리자 입력 암호를 체크합니다.
+  //동일한 아이디가 존재할 경우 
+  if (admin) {
+
+    //DB저장된 암호와 관리자가 로그인화면에서 입력한 암호가 일치하는지 체크
+    //bcrypt.compare('로그인화면에서 전달된 암호', db에 저장된 암호화된 문자열)메소드는 암호가 같으면 true반환, 다르면 false반환
+    if (bcrypt.compare(admin_password, admin.admin_password)) {
+      //Step4: 아이디/암호가 일치하면 메인페이지로 이동시키고
+      //그렇지 않으면 처리결과 data를 login.ejs에 전달
+      //정상 로그인시
+      res.redirect('/main');
+    } else {
+      //암호가 일치하지 않은 경우
+      resultMsg.code = 402;
+      resultMsg.msg = "암호가 일치하지 않습니다."
+      res.render('login.ejs', { layout: false, resultMsg });
+    }
+  } else {
+    //동일한 아이디가 없는경우 
+    resultMsg.code = 401;
+    resultMsg.msg = "동일한 아이디가 존재하지 않습니다."
+    res.render('login.ejs', { layout: false, resultMsg });
+  }
+});
+
+
+// 정상적으로 로그인 시 보여줄 메인페이지 요청과 응답처리 라우팅메소드
 // 요청주소: http://localhost:5001/main
-router.get('/main',function(req,res,next){
+router.get('/main', async (req, res, next) => {
   res.render('main.ejs');
-})
+});
+
+
 
 module.exports = router;

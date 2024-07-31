@@ -4,8 +4,14 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+//환경설정파일 구성하기
+require('dotenv').config()
+
 //레이아웃 노드패키지 참조하기
 var expressLayouts = require('express-ejs-layouts');
+
+//ORM DB연결 객체 참조하기
+var sequelize = require('./models/index.js').sequelize;
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -17,6 +23,9 @@ var channelRouter = require('./routes/channel');
 var messageRouter = require('./routes/message');
 
 var app = express();
+
+//mysql과 자동연결처리 및 모델기반 물리 테이블 생성처리제공
+sequelize.sync();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -46,12 +55,12 @@ app.use('/channel', channelRouter);
 app.use('/message', messageRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
