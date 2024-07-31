@@ -12,6 +12,7 @@ var db = require('../models/index');
 // 호출방식: Get
 // 응답결과: 전체 게시글 목록이 포함된 웹페이지 반환
 router.get('/list', async (req, res) => {
+    //index.js에 있는 Article 변수
     const articles = await db.Article.findAll();
 
 
@@ -89,7 +90,6 @@ router.post('/modify', async (req, res) => {
     res.redirect('/article/list');
 });
 
-var db = require('../models')
 
 //기존 단일 게시글 삭제 처리 요청과 응답처리 라우팅메소드
 //호출주소: http:localhost:3000/article/delete?id=1
