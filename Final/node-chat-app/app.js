@@ -1,9 +1,14 @@
+
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+//환경설정정보 구성하기
+require('dotenv').config()
+
+//시퀄라이즈 ORM을 이용해 db서버와 연결작업 진행
 var sequelize = require('./models/index.js').sequelize;
 
 
@@ -12,6 +17,9 @@ const cors = require("cors");
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+
+//회원정보 관리 RESTful API 라우터파일 참조하기
+var memberAPIRouter = require('./routes/memberAPI');
 
 var app = express();
 
@@ -41,6 +49,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/api/member', memberAPIRouter);
 
 
 
