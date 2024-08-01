@@ -10,7 +10,15 @@ module.exports = (server) => {
     //서버 소켓의 입출력(In/Out) 메시지 처리 객체 io 생성
     //input 메시지는 웹브라우저에서 들어오는 메시지
     //output 메시지는 서버소켓에서 웹브라우저로 전송하는 메시지 
-    const io = SocketIO(server, { path: "/socket.io" });
+    //const io = SocketIO(server, { path: "/socket.io" });
+
+    const io = SocketIO(server, {
+        path: "/socket.io",
+        cors: {
+            origin: "*",
+            methods: ["GET", "POST"]
+        },
+    });
 
     //자바스크립트에서 on(이벤트핸들러(처리기))
     //io객체에 connection 이벤트가 발생하면 콜백함수를 실행해라.
@@ -30,6 +38,11 @@ module.exports = (server) => {
             //io.emit()메소드는 서버소켓(io) 연결된 모든 사용자에게 메시지를 보낼때 사용..
             //io.emit('클라이언트 이벤트수신기명',클라이언트로 보낼데이터);
             io.emit("receiveAll", msg);
+        });
+
+        //템플릿에서 보내온 메시지 수신처리기
+        socket.on("sendAll", function (nickName, message) {
+            io.emit("broadCastAll", nickName, message);
         });
 
 
@@ -69,10 +82,13 @@ module.exports = (server) => {
         //접속한 채팅방 명시적 퇴장하기 
         socket.on('exit', async (channel, nickName) => {
 
+            //나를 제외한 채팅방내 모든 사용자에게 퇴장사실알림처리
             socket.to(channel).emit("exitOk", `${nickName}님이 퇴장했습니다.`);
 
+            //socket.leave(채팅방명);//해당 채팅방 나가기 처리
             socket.leave(channel);//채팅방 퇴장처리
 
+            //현재 퇴장하는 사용자한테도 메시지 전송하기
             socket.emit("exitOk", `채팅방을 퇴장했습니다.`);
 
         });
